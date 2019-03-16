@@ -5,9 +5,6 @@
 #include <sstream>
 #include <map>
 
-
-// Global variables
-
 // The main window class name.
 static TCHAR szWindowClass[] = _T("Source");
 static int frameWidth = 1000;
@@ -29,12 +26,15 @@ void initColourScheme() {
 	COLORREF midCharcoal = 0x3d3d3d;
 	COLORREF darkCharcoal = 0x262626;
 	COLORREF accentGold = 0x49f2ff;
+	COLORREF white = 0xf2f2f2;
 
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"lightBlue", lightBlue));
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"midBlue", midBlue));
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"midCharcoal", midCharcoal));
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"darkCharcoal", darkCharcoal));
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"accentGold", accentGold));
+	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"bg", midCharcoal));
+	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"white", white));
 }
 
 HFONT getFont(LPCWSTR fontChoice) {
@@ -52,6 +52,21 @@ HFONT setFont(HDC hdc, LPCWSTR fontChoice) {
 
 void setFont(HWND hw, LPCWSTR fontChoice) {
 	SendMessage(hw, WM_SETFONT, (WPARAM)getFont(fontChoice), TRUE);
+}
+
+HFONT setFont(HDC hdc, long fontSize, LPCWSTR fontChoice, bool isBold, bool isItalic) {
+	HFONT hf;
+	long lfHeight = fontSize;
+	//lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	
+	UINT weight = FW_DONTCARE;
+	if (isBold) {
+		weight = FW_BOLD;
+	}
+
+	hf = CreateFont(lfHeight, 0, 0, 0, weight, FALSE, isItalic, 0, 0, 0, 0, 0, 0, fontChoice);
+	SelectObject(hdc, hf);
+	return hf;
 }
 
 int CALLBACK WinMain(
@@ -72,7 +87,7 @@ int CALLBACK WinMain(
 	wcex.hInstance = hInstance;
 	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)CreateSolidBrush(colourScheme.at(L"lightBlue"));
+	wcex.hbrBackground = (HBRUSH)CreateSolidBrush(colourScheme.at(L"bg"));
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
@@ -174,7 +189,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
-		setFont(hdc, L"Futura");
+		setFont(hdc, 20, L"Futura", true, false);
+		SetBkColor(hdc, colourScheme.at(L"bg"));
+		SetTextColor(hdc, colourScheme.at(L"white"));
 		TextOut(hdc,
 			5, 100,
 			frameTitle, _tcslen(frameTitle));
