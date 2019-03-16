@@ -27,7 +27,7 @@ HINSTANCE hInst;
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 
-TCHAR Language[12][11] =
+TCHAR Languages[12][11] =
 {
 	TEXT("English"), TEXT("French"), TEXT("Italian"), TEXT("Spanish"),
 	TEXT("German"), TEXT("Portuguese"), TEXT("Polish"), TEXT("Dutch"),
@@ -44,6 +44,18 @@ HWND createLanguageSelector() {
 		CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
 		xpos, ypos, nwidth, nheight, parentWindow, NULL, hInst,
 		NULL);
+
+	TCHAR A[16];
+	int i = 0;
+
+	memset(&A, 0, sizeof(A));
+	for (i = 0; i <= 8; i += 1)
+	{
+		wcscpy_s(A, sizeof(A) / sizeof(TCHAR), (TCHAR*)Languages[i]);
+		// Add string to combobox.
+		SendMessage(hWndComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)A);
+	}
+	SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)2, (LPARAM)0);
 	return hWndComboBox;
 }
 
@@ -115,7 +127,7 @@ int CALLBACK WinMain(
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
-	
+
 	if (!RegisterClassEx(&wcex))
 	{
 		MessageBox(NULL,
@@ -219,7 +231,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetBkColor(hdc, colourScheme.at(L"bg"));
 		SetTextColor(hdc, colourScheme.at(L"white"));
 		TextOut(hdc,
-			534,20,
+			534, 20,
 			frameTitle, _tcslen(frameTitle));
 		// End application-specific layout section.
 
