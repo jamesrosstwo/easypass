@@ -69,12 +69,25 @@ int CALLBACK WinMain(
 		szTitle,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		500, 100,
+		1000, 750,
 		NULL,
 		NULL,
 		hInstance,
 		NULL
 	);
+
+	HWND hwndButton = CreateWindow(
+		L"BUTTON",  // Predefined class; Unicode assumed 
+		L"Generate",      // Button text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+		10,         // x position 
+		10,         // y position 
+		100,        // Button width
+		100,        // Button height
+		hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
 
 	if (!hWnd)
 	{
@@ -114,7 +127,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hdc;
-	TCHAR greeting[] = _T("Hello, Windows desktop!");
+	TCHAR greeting[] = _T("Hello, Windows desktop");
 
 	switch (message)
 	{
@@ -125,7 +138,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// For this introduction, we just print out "Hello, Windows desktop!"
 		// in the top left corner.
 		TextOut(hdc,
-			5, 5,
+			5, 100,
 			greeting, _tcslen(greeting));
 		// End application-specific layout section.
 
