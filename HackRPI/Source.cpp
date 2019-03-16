@@ -222,7 +222,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HFONT g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 	COLORREF g_rgbText = RGB(0, 0, 0);
 	TCHAR frameTitle[] = _T("Mnemonic Password Generator");
-
 	switch (message)
 	{
 	case WM_PAINT:
@@ -236,6 +235,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// End application-specific layout section.
 
 		EndPaint(hWnd, &ps);
+		break;
+	case WM_COMMAND:
+		if ((HWND)lParam == genPasswordButton) {
+			OutputDebugString(L"Generate!");
+		}
+		if ((HWND)lParam == languageSelector && HIWORD(wParam) == CBN_SELCHANGE) {
+			OutputDebugString(L"LANUGAEG");
+			int ItemIndex = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL,
+				(WPARAM)0, (LPARAM)0);
+			TCHAR  ListItem[256];
+			(TCHAR)SendMessage((HWND)lParam, (UINT)CB_GETLBTEXT,
+				(WPARAM)ItemIndex, (LPARAM)ListItem);
+
+			MessageBox(hWnd, (LPCWSTR)ListItem, TEXT("Item Selected"), MB_OK);
+		}
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
