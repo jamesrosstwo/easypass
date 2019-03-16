@@ -18,5 +18,48 @@
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PasswordGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PasswordGenerator.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Words\danish.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\dutch.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\finnish.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\french.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\german.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\italian.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\norwegian.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\polish.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\portuguese.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\spanish.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Words\english.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

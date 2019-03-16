@@ -143,7 +143,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="PasswordGenerator.cpp" />
     <ClCompile Include="Source.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PasswordGenerator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Words\danish.txt" />
+    <Text Include="Words\dutch.txt" />
+    <Text Include="Words\english.txt" />
+    <Text Include="Words\finnish.txt" />
+    <Text Include="Words\french.txt" />
+    <Text Include="Words\german.txt" />
+    <Text Include="Words\italian.txt" />
+    <Text Include="Words\norwegian.txt" />
+    <Text Include="Words\polish.txt" />
+    <Text Include="Words\portuguese.txt" />
+    <Text Include="Words\spanish.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
