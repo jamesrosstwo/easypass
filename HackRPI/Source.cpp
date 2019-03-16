@@ -4,21 +4,48 @@
 #include <tchar.h>
 #include <sstream>
 #include <map>
+#include <CommCtrl.h>
+
 
 // The main window class name.
 static TCHAR szWindowClass[] = _T("Source");
-static int frameWidth = 1000;
+static int frameWidth = 1400;
 static int frameHeight = 750;
 static std::map<LPCWSTR, COLORREF> colourScheme;
+static LPCWSTR defaultFontType = L"Segoe UI";
 
 // The string that appears in the application's title bar.
 static TCHAR szTitle[] = _T("Mnemonic Passwords");
 HFONT defaultFont;
+HWND parentWindow;
 HWND genPasswordButton;
+HWND languageSelector;
+HWND numWordsSelector;
 HINSTANCE hInst;
 
 // Forward declarations of functions included in this code module:
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+
+TCHAR Language[12][11] =
+{
+	TEXT("English"), TEXT("French"), TEXT("Italian"), TEXT("Spanish"),
+	TEXT("German"), TEXT("Portuguese"), TEXT("Polish"), TEXT("Dutch"),
+	TEXT("Dutch"), TEXT("Finnish"), TEXT("Danish"), TEXT("Norwegian")
+};
+
+HWND createLanguageSelector() {
+	int xpos = 100;            // Horizontal position of the window.
+	int ypos = 100;            // Vertical position of the window.
+	int nwidth = 200;          // Width of the window
+	int nheight = 200;         // Height of the window
+
+	HWND hWndComboBox = CreateWindow(WC_COMBOBOX, TEXT(""),
+		CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
+		xpos, ypos, nwidth, nheight, parentWindow, NULL, hInst,
+		NULL);
+	return hWndComboBox;
+}
 
 void initColourScheme() {
 	COLORREF lightBlue = 0xffa670;
@@ -56,15 +83,12 @@ void setFont(HWND hw, LPCWSTR fontChoice) {
 
 HFONT setFont(HDC hdc, long fontSize, LPCWSTR fontChoice, bool isBold, bool isItalic) {
 	HFONT hf;
-	long lfHeight = fontSize;
-	//lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-	
 	UINT weight = FW_DONTCARE;
 	if (isBold) {
-		weight = FW_BOLD;
+		weight = FW_SEMIBOLD;
 	}
 
-	hf = CreateFont(lfHeight, 0, 0, 0, weight, FALSE, isItalic, 0, 0, 0, 0, 0, 0, fontChoice);
+	hf = CreateFont(fontSize, 0, 0, 0, weight, FALSE, isItalic, 0, 0, 0, 0, 0, 0, fontChoice);
 	SelectObject(hdc, hf);
 	return hf;
 }
@@ -91,7 +115,7 @@ int CALLBACK WinMain(
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
-
+	
 	if (!RegisterClassEx(&wcex))
 	{
 		MessageBox(NULL,
@@ -115,7 +139,7 @@ int CALLBACK WinMain(
 	// NULL: this application does not have a menu bar
 	// hInstance: the first parameter from WinMain
 	// NULL: not used in this application
-	HWND parentWnd = CreateWindow(
+	parentWindow = CreateWindow(
 		szWindowClass,
 		szTitle,
 		WS_OVERLAPPEDWINDOW,
@@ -126,24 +150,26 @@ int CALLBACK WinMain(
 		hInstance,
 		NULL
 	);
-	setFont(parentWnd, L"Futura");
-	defaultFont = CreateFont(-17, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, L"Futura");
+	setFont(parentWindow, defaultFontType);
+	defaultFont = CreateFont(-17, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, defaultFontType);
+
+	languageSelector = createLanguageSelector();
 
 	genPasswordButton = CreateWindow(
 		L"BUTTON",  // Predefined class; Unicode assumed 
 		L"Generate",      // Button text 
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
-		10,         // x position 
-		10,         // y position 
+		500,         // x position 
+		650,         // y position 
 		400,        // Button width
 		50,        // Button height
-		parentWnd,     // Parent window
+		parentWindow,     // Parent window
 		NULL,       // No menu.
-		(HINSTANCE)GetWindowLong(parentWnd, GWL_HINSTANCE),
+		(HINSTANCE)GetWindowLong(parentWindow, GWL_HINSTANCE),
 		NULL);      // Pointer not needed.
 	SendMessage(genPasswordButton, WM_SETFONT, (WPARAM)defaultFont, TRUE);
 
-	if (!parentWnd)
+	if (!parentWindow)
 	{
 		MessageBox(NULL,
 			_T("Call to CreateWindow failed!"),
@@ -156,9 +182,9 @@ int CALLBACK WinMain(
 	// The parameters to ShowWindow explained:
 	// hWnd: the value returned from CreateWindow
 	// nCmdShow: the fourth parameter from WinMain
-	ShowWindow(parentWnd,
+	ShowWindow(parentWindow,
 		nCmdShow);
-	UpdateWindow(parentWnd);
+	UpdateWindow(parentWindow);
 
 	// Main message loop:
 	MSG msg;
@@ -189,11 +215,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
-		setFont(hdc, 20, L"Futura", true, false);
+		setFont(hdc, 30, defaultFontType, true, false);
 		SetBkColor(hdc, colourScheme.at(L"bg"));
 		SetTextColor(hdc, colourScheme.at(L"white"));
 		TextOut(hdc,
-			5, 100,
+			534,20,
 			frameTitle, _tcslen(frameTitle));
 		// End application-specific layout section.
 
