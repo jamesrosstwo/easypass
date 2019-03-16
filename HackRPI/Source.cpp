@@ -1,19 +1,21 @@
-// HelloWindowsDesktop.cpp
-// compile with: /D_UNICODE /DUNICODE /DWIN32 /D_WINDOWS /c
-
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
+#include <sstream>
+
 
 // Global variables
 
 // The main window class name.
-static TCHAR szWindowClass[] = _T("DesktopApp");
+static TCHAR szWindowClass[] = _T("Source");
+static int frameWidth = 1000;
+static int frameHeight = 750;
 
 // The string that appears in the application's title bar.
-static TCHAR szTitle[] = _T("Windows Desktop Guided Tour Application");
-
+static TCHAR szTitle[] = _T("Mnemonic Passwords");
+HFONT defaultFont;
+HWND genPasswordButton;
 HINSTANCE hInst;
 
 // Forward declarations of functions included in this code module:
@@ -64,32 +66,35 @@ int CALLBACK WinMain(
 	// NULL: this application does not have a menu bar
 	// hInstance: the first parameter from WinMain
 	// NULL: not used in this application
-	HWND hWnd = CreateWindow(
+	HWND parentWnd = CreateWindow(
 		szWindowClass,
 		szTitle,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		1000, 750,
+		frameWidth, frameHeight,
 		NULL,
 		NULL,
 		hInstance,
 		NULL
 	);
 
-	HWND hwndButton = CreateWindow(
+	defaultFont = CreateFont(-17, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, L"Futura");
+
+	genPasswordButton = CreateWindow(
 		L"BUTTON",  // Predefined class; Unicode assumed 
 		L"Generate",      // Button text 
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
 		10,         // x position 
 		10,         // y position 
-		100,        // Button width
-		100,        // Button height
-		hWnd,     // Parent window
+		400,        // Button width
+		50,        // Button height
+		parentWnd,     // Parent window
 		NULL,       // No menu.
-		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
+		(HINSTANCE)GetWindowLong(parentWnd, GWL_HINSTANCE),
 		NULL);      // Pointer not needed.
+	SendMessage(genPasswordButton, WM_SETFONT, (WPARAM)defaultFont, TRUE);
 
-	if (!hWnd)
+	if (!parentWnd)
 	{
 		MessageBox(NULL,
 			_T("Call to CreateWindow failed!"),
@@ -102,9 +107,9 @@ int CALLBACK WinMain(
 	// The parameters to ShowWindow explained:
 	// hWnd: the value returned from CreateWindow
 	// nCmdShow: the fourth parameter from WinMain
-	ShowWindow(hWnd,
+	ShowWindow(parentWnd,
 		nCmdShow);
-	UpdateWindow(hWnd);
+	UpdateWindow(parentWnd);
 
 	// Main message loop:
 	MSG msg;
@@ -117,6 +122,23 @@ int CALLBACK WinMain(
 	return (int)msg.wParam;
 }
 
+HFONT getFont(LPCWSTR fontChoice) {
+	return CreateFont(-17, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontChoice);
+}
+
+HFONT setFont(HDC hdc, LPCWSTR fontChoice) {
+	HFONT hf;
+	long lfHeight;
+	lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	hf = CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontChoice);
+	SelectObject(hdc, hf);
+	return hf;
+}
+
+void setFont(HWND hw, LPCWSTR fontChoice) {
+	SendMessage(hw, WM_SETFONT, (WPARAM)getFont(fontChoice), TRUE);
+}
+
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
 //  PURPOSE:  Processes messages for the main window.
@@ -127,19 +149,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hdc;
-	TCHAR greeting[] = _T("Hello, Windows desktop");
+	HFONT g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+	COLORREF g_rgbText = RGB(0, 0, 0);
+	TCHAR frameTitle[] = _T("Mnemonic Password Generator");
 
 	switch (message)
 	{
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
-
-		// Here your application is laid out.
-		// For this introduction, we just print out "Hello, Windows desktop!"
-		// in the top left corner.
+		setFont(hdc, L"Futura");
 		TextOut(hdc,
 			5, 100,
-			greeting, _tcslen(greeting));
+			frameTitle, _tcslen(frameTitle));
 		// End application-specific layout section.
 
 		EndPaint(hWnd, &ps);
