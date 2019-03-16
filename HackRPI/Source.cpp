@@ -3,6 +3,7 @@
 #include <string.h>
 #include <tchar.h>
 #include <sstream>
+#include <map>
 
 
 // Global variables
@@ -11,6 +12,7 @@
 static TCHAR szWindowClass[] = _T("Source");
 static int frameWidth = 1000;
 static int frameHeight = 750;
+static std::map<LPCWSTR, COLORREF> colourScheme;
 
 // The string that appears in the application's title bar.
 static TCHAR szTitle[] = _T("Mnemonic Passwords");
@@ -21,6 +23,37 @@ HINSTANCE hInst;
 // Forward declarations of functions included in this code module:
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
+void initColourScheme() {
+	COLORREF lightBlue = 0xffa670;
+	COLORREF midBlue = 0xf48642;
+	COLORREF midCharcoal = 0x3d3d3d;
+	COLORREF darkCharcoal = 0x262626;
+	COLORREF accentGold = 0x49f2ff;
+
+	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"lightBlue", lightBlue));
+	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"midBlue", midBlue));
+	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"midCharcoal", midCharcoal));
+	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"darkCharcoal", darkCharcoal));
+	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"accentGold", accentGold));
+}
+
+HFONT getFont(LPCWSTR fontChoice) {
+	return CreateFont(-17, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontChoice);
+}
+
+HFONT setFont(HDC hdc, LPCWSTR fontChoice) {
+	HFONT hf;
+	long lfHeight;
+	lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	hf = CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontChoice);
+	SelectObject(hdc, hf);
+	return hf;
+}
+
+void setFont(HWND hw, LPCWSTR fontChoice) {
+	SendMessage(hw, WM_SETFONT, (WPARAM)getFont(fontChoice), TRUE);
+}
+
 int CALLBACK WinMain(
 	_In_ HINSTANCE hInstance,
 	_In_ HINSTANCE hPrevInstance,
@@ -28,8 +61,9 @@ int CALLBACK WinMain(
 	_In_ int       nCmdShow
 )
 {
-	WNDCLASSEX wcex;
+	initColourScheme();
 
+	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc = WndProc;
@@ -38,7 +72,7 @@ int CALLBACK WinMain(
 	wcex.hInstance = hInstance;
 	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.hbrBackground = (HBRUSH)CreateSolidBrush(colourScheme.at(L"lightBlue"));
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
@@ -77,7 +111,7 @@ int CALLBACK WinMain(
 		hInstance,
 		NULL
 	);
-
+	setFont(parentWnd, L"Futura");
 	defaultFont = CreateFont(-17, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, L"Futura");
 
 	genPasswordButton = CreateWindow(
@@ -120,23 +154,6 @@ int CALLBACK WinMain(
 	}
 
 	return (int)msg.wParam;
-}
-
-HFONT getFont(LPCWSTR fontChoice) {
-	return CreateFont(-17, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontChoice);
-}
-
-HFONT setFont(HDC hdc, LPCWSTR fontChoice) {
-	HFONT hf;
-	long lfHeight;
-	lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-	hf = CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontChoice);
-	SelectObject(hdc, hf);
-	return hf;
-}
-
-void setFont(HWND hw, LPCWSTR fontChoice) {
-	SendMessage(hw, WM_SETFONT, (WPARAM)getFont(fontChoice), TRUE);
 }
 
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
