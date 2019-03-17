@@ -1,4 +1,3 @@
-#include <windows.h>
 #include <objidl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,8 +10,11 @@
 #include <algorithm>
 #include <vector>
 #include <gdiplus.h>
+#include <fstream>
 #include "PasswordGenerator.h"
 #include "StringConverter.h"
+#include "Account.h"
+#include "Blowfish.h"
 
 #define IDC_MAIN_EDIT 101
 
@@ -49,12 +51,9 @@ std::wstring currentUsername;
 std::wstring currentPass;
 int passwordLength = 20;
 
-struct Account {
-	std::wstring title;
-	std::wstring username;
-	std::wstring password;
-};
 std::vector<Account> accounts;
+
+BLOWFISH * bf;
 
 
 // Forward declarations of functions included in this code module:
@@ -66,6 +65,50 @@ TCHAR Languages[12][11] =
 	TEXT("German"), TEXT("Portuguese"), TEXT("Polish"), TEXT("Dutch"),
 	TEXT("Finnish"), TEXT("Danish"), TEXT("Norwegian")
 };
+
+const std::string address = "C:\\Users\\james.ross\\Desktop\\pass.txt";
+std::vector<Account> decrypt(BLOWFISH  enc) {
+	std::wifstream fileIn(address);
+	std::vector<Account> vec;
+	while (fileIn.peek() != std::wifstream::traits_type::eof()) {
+		std::wstring next;
+		std::getline(fileIn, next);
+		std::string s = WidestringToString(next);
+		std::string delimiter = " ";
+		Account nextAcc;
+		size_t pos = 0;
+		pos = s.find(delimiter);
+		std::string token;
+		token = s.substr(0, pos);
+
+		nextAcc.title = StringToWidestring(enc.Decrypt_CBC(token));
+		s.erase(0, pos + delimiter.length());
+		pos = s.find(delimiter);
+		token = s.substr(0, pos);
+		nextAcc.username = StringToWidestring(enc.Decrypt_CBC(token));
+		s.erase(0, pos + delimiter.length());
+		pos = s.find(delimiter);
+		nextAcc.password = StringToWidestring(enc.Decrypt_CBC(s));
+
+		vec.push_back(nextAcc);
+
+
+	}
+	return vec;
+}
+
+void encrypt(BLOWFISH dec, std::vector<Account> input) {
+
+	std::ofstream fileOut(address);
+	for (Account next : input) {
+		fileOut << dec.Encrypt_CBC(WidestringToString(next.title));
+		fileOut << " ";
+		fileOut << dec.Encrypt_CBC(WidestringToString(next.username));
+		fileOut << " ";
+		fileOut << dec.Encrypt_CBC(WidestringToString(next.password)) << std::endl;
+	}
+
+}
 
 void initColourScheme() {
 	COLORREF lightBlue = 0xffa670;
@@ -215,6 +258,14 @@ int CALLBACK WinMain(
 )
 {
 	initColourScheme();
+	std::wstring mPassword;
+	std::wifstream wStream("C:\\Users\\james.ross\\Desktop\\masterpass.txt");
+	getline(wStream, mPassword);
+	OutputDebugString(mPassword.c_str());
+	bf = new BLOWFISH(WidestringToString(mPassword));
+
+	accounts = decrypt(*bf);
+
 
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -470,6 +521,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				SetWindowTextW(titleBox, L"");
 				currentPass = L"";
 				InvalidateRect(hWnd, 0, TRUE);
+				encrypt(*bf, accounts);
 			}
 		}
 		else if ((HWND)lParam == languageSelector && HIWORD(wParam) == CBN_SELCHANGE) {

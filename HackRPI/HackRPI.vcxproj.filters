@@ -21,9 +21,6 @@
     <ClCompile Include="PasswordGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Cipher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StringConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,12 +30,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blowfish.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Cipher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FullCipher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StringConverter.h">
