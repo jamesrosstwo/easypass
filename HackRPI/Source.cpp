@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <objidl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
@@ -9,7 +10,9 @@
 #include <locale>
 #include <algorithm>
 #include <vector>
+#include <gdiplus.h>
 #include "PasswordGenerator.h"
+#include "StringConverter.h"
 
 #define IDC_MAIN_EDIT 101
 
@@ -56,24 +59,6 @@ std::vector<Account> accounts;
 
 // Forward declarations of functions included in this code module:
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-
-std::string WidestringToString(const std::wstring &wstr)
-{
-	if (wstr.empty()) return std::string();
-	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-	std::string strTo(size_needed, 0);
-	WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
-	return strTo;
-}
-
-std::wstring StringToWidestring(const std::string &str)
-{
-	if (str.empty()) return std::wstring();
-	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
-	std::wstring wstrTo(size_needed, 0);
-	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
-	return wstrTo;
-}
 
 TCHAR Languages[12][11] =
 {
@@ -384,6 +369,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HBRUSH navbarBrush = CreateSolidBrush(colourScheme.at(L"midBlue"));
 		FillRect(hdc, &navbar, navbarBrush);
 
+	/*	Gdiplus::Graphics graphics(hdc);
+		Gdiplus::Pen pen(colourScheme.at(L"accentGold"));
+		graphics.DrawLine(&pen, 700, 50, 700, 700);*/
+
 		setFont(hdc, 45, defaultFontType, FW_DONTCARE, false);
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, colourScheme.at(L"white"));
@@ -425,7 +414,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		setFont(hdc, 16 + 200/len, defaultFontType, FW_THIN, false);
 		TextOut(hdc,
-			150, 400,
+			150, 400 + len/15,
 			currentPass.c_str(), len
 		);
 

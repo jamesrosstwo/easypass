@@ -1,6 +1,4 @@
 #include "Cipher.h"
-#include "Blowfish.h"
-#include "StringConverter.h"
 #include <fstream>
 const std::string address = "";
 std::vector<Account> decrypt( BLOWFISH  enc) {
