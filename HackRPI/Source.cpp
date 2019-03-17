@@ -32,6 +32,7 @@ HWND languageSelector;
 HWND titleBox;
 HWND usernameBox;
 HWND numWordsSelector;
+HWND passwordLengthSelector;
 HINSTANCE hInst;
 
 std::string currentLang = "english";
@@ -169,12 +170,50 @@ HWND createUsernameBox() {
 	return hw;
 }
 
+HWND createLengthSelector() {
+	int x = 300;
+	int y = 195 + optionYOffset;
+	int w = 250;
+	int h = 25;
+
+	long iMin = 4;
+	long iMax = 60;
+	long defaultPos = 20;
+
+	HWND hw = CreateWindowExW(0, TRACKBAR_CLASS, L"Trackbar Control",
+		WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_TRANSPARENTBKGND | TBS_BOTTOM,
+		x, y, w, h,
+		parentWindow, NULL, hInst, NULL);
+
+	SendMessage(hw, TBM_SETRANGE,
+		(WPARAM)TRUE,                   // redraw flag 
+		(LPARAM)MAKELONG(iMin, iMax));
+
+	SendMessage(hw, TBM_SETTICFREQ,
+		(WPARAM)5,
+		(LPARAM)0);
+
+	SendMessage(hw, TBM_SETPAGESIZE,
+		0, (LPARAM)4);
+
+	//SendMessage(hw, TBM_SETSEL,
+	//	(WPARAM)FALSE,                  // redraw flag 
+	//	(LPARAM)MAKELONG(iSelMin, iSelMax));
+
+	SendMessage(hw, TBM_SETPOS,
+		(WPARAM)TRUE,                   // redraw flag 
+		(LPARAM)defaultPos);
+
+
+	return hw;
+}
+
 std::wstring getTextFromTextBox(HWND tBox) {
-    int length = GetWindowTextLengthW(tBox);
-    std::wstring buf (length+1, '\000'); // + 1 for extra null GetWindowTextW wants to write
-    GetWindowTextW(tBox, buf.data(), buf.size());
-    buf.resize(length); // throw away extra null, std::(w)string already has one
-    return buf;
+	int length = GetWindowTextLengthW(tBox);
+	std::wstring buf(length + 1, '\000'); // + 1 for extra null GetWindowTextW wants to write
+	GetWindowTextW(tBox, buf.data(), buf.size());
+	buf.resize(length); // throw away extra null, std::(w)string already has one
+	return buf;
 }
 
 int CALLBACK WinMain(
@@ -241,6 +280,8 @@ int CALLBACK WinMain(
 
 	titleBox = createTitleBox();
 	usernameBox = createUsernameBox();
+	passwordLengthSelector = createLengthSelector();
+
 
 	genPasswordButton = CreateWindow(
 		L"BUTTON",  // Predefined class; Unicode assumed 
@@ -255,7 +296,7 @@ int CALLBACK WinMain(
 		(HINSTANCE)GetWindowLong(parentWindow, GWL_HINSTANCE),
 		NULL);      // Pointer not needed.
 	SendMessage(genPasswordButton, WM_SETFONT, (WPARAM)defaultFont, TRUE);
-	
+
 	savePasswordButton = CreateWindow(
 		L"BUTTON",  // Predefined class; Unicode assumed 
 		L"Save",      // Button text 
@@ -327,7 +368,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		HBRUSH navbarBrush = CreateSolidBrush(colourScheme.at(L"midBlue"));
 		FillRect(hdc, &navbar, navbarBrush);
-		
+
 		setFont(hdc, 45, defaultFontType, FW_DONTCARE, false);
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, colourScheme.at(L"white"));
@@ -354,11 +395,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetTextColor(hdc, colourScheme.at(L"accentGold"));
 
 		UINT len = _tcslen(currentPass.c_str());
-		setFont(hdc, 65-len, defaultFontType, FW_THIN, false);
+		setFont(hdc, 65 - len, defaultFontType, FW_THIN, false);
 		TextOut(hdc,
 			150, 300,
 			currentPass.c_str(), len
-			);
+		);
 
 		SetTextColor(hdc, colourScheme.at(L"white"));
 		setFont(hdc, 30, defaultFontType, FW_THIN, false);
