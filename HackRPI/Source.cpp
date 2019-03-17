@@ -68,31 +68,6 @@ TCHAR Languages[12][11] =
 	TEXT("Finnish"), TEXT("Danish"), TEXT("Norwegian")
 };
 
-HWND createLanguageSelector() {
-	int xpos = 100;            // Horizontal position of the window.
-	int ypos = 100;            // Vertical position of the window.
-	int nwidth = 200;          // Width of the window
-	int nheight = 200;         // Height of the window
-
-	HWND hWndComboBox = CreateWindow(WC_COMBOBOX, TEXT(""),
-		CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
-		xpos, ypos, nwidth, nheight, parentWindow, NULL, hInst,
-		NULL);
-
-	TCHAR A[16];
-	int i = 0;
-
-	memset(&A, 0, sizeof(A));
-	for (i = 0; i <= 12; i += 1)
-	{
-		wcscpy_s(A, sizeof(A) / sizeof(TCHAR), (TCHAR*)Languages[i]);
-		// Add string to combobox.
-		SendMessage(hWndComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)A);
-	}
-	SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
-	return hWndComboBox;
-}
-
 void initColourScheme() {
 	COLORREF lightBlue = 0xffa670;
 	COLORREF midBlue = 0xf48642;
@@ -137,6 +112,30 @@ HFONT setFont(HDC hdc, long fontSize, LPCWSTR fontChoice, bool isBold, bool isIt
 	hf = CreateFont(fontSize, 0, 0, 0, weight, FALSE, isItalic, 0, 0, 0, 0, 0, 0, fontChoice);
 	SelectObject(hdc, hf);
 	return hf;
+}
+
+HWND createLanguageSelector() {
+	int xpos = 100;            // Horizontal position of the window.
+	int ypos = 100;            // Vertical position of the window.
+	int nwidth = 200;          // Width of the window
+	int nheight = 200;         // Height of the window
+
+	HWND hWndComboBox = CreateWindow(WC_COMBOBOX, TEXT(""),
+		CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
+		xpos, ypos, nwidth, nheight, parentWindow, NULL, hInst,
+		NULL);
+	setFont(hWndComboBox, defaultFontType);
+	TCHAR A[16];
+	int i = 0;
+	memset(&A, 0, sizeof(A));
+	for (i = 0; i <= 12; i += 1)
+	{
+		wcscpy_s(A, sizeof(A) / sizeof(TCHAR), (TCHAR*)Languages[i]);
+		// Add string to combobox.
+		SendMessage(hWndComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)A);
+	}
+	SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+	return hWndComboBox;
 }
 
 int CALLBACK WinMain(
