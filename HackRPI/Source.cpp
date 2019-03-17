@@ -39,6 +39,7 @@ std::string currentLang = "english";
 std::wstring currentTitle;
 std::wstring currentUsername;
 std::wstring currentPass;
+int passwordLength = 20;
 
 struct Account {
 	std::wstring title;
@@ -356,6 +357,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	TCHAR frameTitle[] = _T("Mnemonic Password Generator");
 	switch (message)
 	{
+	case WM_HSCROLL:
+	{
+		if (LOWORD(wParam) == SB_THUMBPOSITION || LOWORD(wParam) == SB_THUMBTRACK) {
+			passwordLength = HIWORD(wParam);
+		}
+		else if (LOWORD(wParam) == SB_ENDSCROLL) {
+			InvalidateRect(hWnd, 0, TRUE);
+		}
+	}
+	break;
 	case WM_PAINT:
 	{
 		hdc = BeginPaint(hWnd, &ps);
@@ -391,13 +402,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		TextOut(hdc,
 			150, 130 + optionYOffset,
 			L"Username", _tcslen(L"Username"));
+		
+		std::wstringstream wss;
+		std::wstring ws;
+
+		wss << passwordLength;
+		wss >> ws;
+		std::wstring t = L"# of Letters: " + ws;
+		TextOut(hdc,
+			150, 190 + optionYOffset,
+			t.c_str(), _tcslen(t.c_str()));
 
 		SetTextColor(hdc, colourScheme.at(L"accentGold"));
 
 		UINT len = _tcslen(currentPass.c_str());
-		setFont(hdc, 65 - len, defaultFontType, FW_THIN, false);
+		if (len == 0) {
+			len = 1;
+		}
+		setFont(hdc, 16 + 200/len, defaultFontType, FW_THIN, false);
 		TextOut(hdc,
-			150, 300,
+			150, 400,
 			currentPass.c_str(), len
 		);
 
@@ -418,7 +442,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_COMMAND:
 		if ((HWND)lParam == genPasswordButton) {
-			currentPass = genPass(30, currentLang);
+			currentPass = genPass(passwordLength, currentLang);
 
 			InvalidateRect(hWnd, 0, TRUE);
 		}
