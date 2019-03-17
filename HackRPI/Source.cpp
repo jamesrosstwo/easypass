@@ -307,7 +307,7 @@ int CALLBACK WinMain(
 	if (!RegisterClassEx(&wcex))
 	{
 		MessageBox(NULL,
-			_T("Call to RegisterClassEx failed!"),
+			_T("Call to RegisterClassEx failed!                   "),
 			_T("Windows Desktop Guided Tour"),
 			NULL);
 
@@ -383,7 +383,7 @@ int CALLBACK WinMain(
 	if (!parentWindow)
 	{
 		MessageBox(NULL,
-			_T("Call to CreateWindow failed!"),
+			_T("Call to CreateWindow failed!                   "),
 			_T("Windows Desktop Guided Tour"),
 			NULL);
 
@@ -529,19 +529,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			std::wstring username = getTextFromTextBox(usernameBox);
 			if (title.empty()) {
 				MessageBox(parentWindow,
-					_T("Missing Title"),
+					_T("Missing Title                                      "),
 					_T("Password Generation"),
 					NULL);
 			}
 			else if (username.empty()) {
 				MessageBox(parentWindow,
-					_T("Missing Username"),
+					_T("Missing Username                                      "),
 					_T("Password Generation"),
 					NULL);
 			}
 			else if (currentPass.empty()) {
 				MessageBox(parentWindow,
-					_T("Missing Password"),
+					_T("Missing Password                                      "),
 					_T("Password Generation"),
 					NULL);
 			}
@@ -571,7 +571,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			std::transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
 			currentLang = choice;
 		}
-		else {
+		else if(LOWORD(wParam) == BN_CLICKED){
 			int i = 0;
 			for (HWND dButton : deleteButtons) {
 				if ((HWND)lParam == dButton)
