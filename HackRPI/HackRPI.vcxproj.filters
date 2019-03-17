@@ -21,6 +21,29 @@
     <ClCompile Include="PasswordGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cipher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PasswordGenerator.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blowfish.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cipher.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Account.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StringConverter.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FullCipher.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Words\danish.txt">

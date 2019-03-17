@@ -144,11 +144,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cipher.cpp" />
     <ClCompile Include="PasswordGenerator.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Account.h" />
+    <ClInclude Include="Blowfish.h" />
+    <ClInclude Include="Cipher.h" />
+    <ClInclude Include="FullCipher.h" />
     <ClInclude Include="PasswordGenerator.h" />
+    <ClInclude Include="StringConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Words\danish.txt" />

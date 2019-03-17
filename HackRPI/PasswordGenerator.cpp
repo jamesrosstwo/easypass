@@ -33,7 +33,11 @@ std::wstring genPass(int length, std::string lan) {
 		for (int count = 0; count < startIndex; count++) {
 			std::getline(fileIn, input);
 		}
-		while (fileIn.is_open()) {
+		while (fileIn.peek() != std::wifstream::traits_type::eof()) {
+			//take steps;
+			if (length > 50) {
+				return L"shit";
+			}
 			for (int count = 0; count < stepSize; count++) {
 				std::getline(fileIn, input);
 			}
