@@ -8,6 +8,7 @@
 #include <codecvt>
 #include <locale>
 #include <algorithm>
+#include <vector>
 #include "PasswordGenerator.h"
 
 // The main window class name.
@@ -26,7 +27,18 @@ HWND languageSelector;
 HWND numWordsSelector;
 HINSTANCE hInst;
 
-std::string languageChoice = "english";
+std::string currentLang = "english";
+std::wstring currentTitle;
+std::wstring currentUsername;
+std::wstring currentPass;
+
+struct Account {
+	std::wstring title;
+	std::wstring username;
+	std::wstring password;
+};
+std::vector<Account> accounts;
+
 
 // Forward declarations of functions included in this code module:
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -53,7 +65,7 @@ TCHAR Languages[12][11] =
 {
 	TEXT("English"), TEXT("French"), TEXT("Italian"), TEXT("Spanish"),
 	TEXT("German"), TEXT("Portuguese"), TEXT("Polish"), TEXT("Dutch"),
-	TEXT("Dutch"), TEXT("Finnish"), TEXT("Danish"), TEXT("Norwegian")
+	TEXT("Finnish"), TEXT("Danish"), TEXT("Norwegian")
 };
 
 HWND createLanguageSelector() {
@@ -71,7 +83,7 @@ HWND createLanguageSelector() {
 	int i = 0;
 
 	memset(&A, 0, sizeof(A));
-	for (i = 0; i <= 8; i += 1)
+	for (i = 0; i <= 12; i += 1)
 	{
 		wcscpy_s(A, sizeof(A) / sizeof(TCHAR), (TCHAR*)Languages[i]);
 		// Add string to combobox.
@@ -235,6 +247,8 @@ int CALLBACK WinMain(
 //
 //  PURPOSE:  Processes messages for the main window.
 //
+//  WM_CREATE   - Create the window
+//  WM_COMMAND  - React to button press, events, etc
 //  WM_PAINT    - Paint the main window
 //  WM_DESTROY  - post a quit message and return
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -247,6 +261,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_PAINT:
+	{
 		hdc = BeginPaint(hWnd, &ps);
 		setFont(hdc, 30, defaultFontType, true, false);
 		SetBkColor(hdc, colourScheme.at(L"bg"));
@@ -254,16 +269,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		TextOut(hdc,
 			534, 20,
 			frameTitle, _tcslen(frameTitle));
+
+		int iter = 0;
+		for (Account acc : accounts) {
+			OutputDebugString(L"Working");
+			std::wstring txt = acc.title + _T(" - ") + acc.username.c_str() + L": " + acc.password.c_str();
+			TextOut(hdc,
+				200, 400 + iter * 40,
+				txt.c_str(), _tcslen(txt.c_str()));
+			iter++;
+		}
 		// End application-specific layout section.
 
 		EndPaint(hWnd, &ps);
-		break;
+	}
+	break;
 	case WM_COMMAND:
 		if ((HWND)lParam == genPasswordButton) {
-			std::wstring pass = genPass(30, languageChoice);
-			MessageBox(hWnd, pass.c_str(), TEXT("Item Selected"), MB_OK);
+			Account acc;
+			acc.title = _T("testTitle");
+			acc.username = _T("testUsername");
+			acc.password = genPass(30, currentLang);;
+			accounts.push_back(acc);
+
+			for (Account a : accounts) {
+				OutputDebugString(a.title.c_str());
+			}
+
+			InvalidateRect(hWnd, 0, TRUE);
 		}
-		if ((HWND)lParam == languageSelector && HIWORD(wParam) == CBN_SELCHANGE) {
+		else if ((HWND)lParam == languageSelector && HIWORD(wParam) == CBN_SELCHANGE) {
 			int ItemIndex = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL,
 				(WPARAM)0, (LPARAM)0);
 			TCHAR  ListItem[256];
@@ -274,7 +309,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			std::wstring wChoice((LPCWSTR)ListItem);
 			std::string choice = WidestringToString(wChoice);
 			std::transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
-			languageChoice = choice;
+			currentLang = choice;
 		}
 		break;
 	case WM_DESTROY:
