@@ -89,7 +89,7 @@ HWND createLanguageSelector() {
 		// Add string to combobox.
 		SendMessage(hWndComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)A);
 	}
-	SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)2, (LPARAM)0);
+	SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 	return hWndComboBox;
 }
 
