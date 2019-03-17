@@ -43,8 +43,12 @@ HWND titleBox;
 HWND usernameBox;
 HWND numWordsSelector;
 HWND passwordLengthSelector;
-HWND deleteButtons[25];
+
+std::vector<HWND> deleteButtons;
+
 HINSTANCE hInst;
+
+
 
 std::string currentLang = "english";
 std::wstring currentTitle;
@@ -66,6 +70,23 @@ TCHAR Languages[12][11] =
 	TEXT("German"), TEXT("Portuguese"), TEXT("Polish"), TEXT("Dutch"),
 	TEXT("Finnish"), TEXT("Danish"), TEXT("Norwegian")
 };
+
+void addDeleteButton(int yVal) {
+	HWND delButton = CreateWindowW(
+		L"BUTTON",  // Predefined class; Unicode assumed 
+		L"X",      // Button text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+		1300,         // x position 
+		yVal,        // y position 
+		20,        // Button width
+		20,        // Button height
+		parentWindow,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(parentWindow, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+	SendMessage(delButton, WM_SETFONT, (WPARAM)defaultFont, TRUE);
+	deleteButtons.push_back(delButton);
+}
 
 const std::string address = "C:\\Users\\james.ross\\Desktop\\pass.txt";
 std::vector<Account> decrypt(BLOWFISH  enc) {
@@ -266,6 +287,7 @@ int CALLBACK WinMain(
 	bf = new BLOWFISH(WidestringToString(mPassword));
 
 	accounts = decrypt(*bf);
+	addDeleteButton(optionYOffset - 5 + 2 * 25);
 
 
 	WNDCLASSEX wcex;
@@ -324,7 +346,11 @@ int CALLBACK WinMain(
 	titleBox = createTitleBox();
 	usernameBox = createUsernameBox();
 	passwordLengthSelector = createLengthSelector();
-
+	int iter = 0;
+	for (Account acc : accounts) {
+		addDeleteButton(optionYOffset - 5 + iter * 25);
+		iter++;
+	}
 
 	genPasswordButton = CreateWindow(
 		L"BUTTON",  // Predefined class; Unicode assumed 
@@ -453,7 +479,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		TextOut(hdc,
 			150, 130 + optionYOffset,
 			L"Username", _tcslen(L"Username"));
-		
+
 		std::wstringstream wss;
 		std::wstring ws;
 
@@ -470,9 +496,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (len == 0) {
 			len = 1;
 		}
-		setFont(hdc, 16 + 200/len, defaultFontType, FW_THIN, false);
+		setFont(hdc, 16 + 200 / len, defaultFontType, FW_THIN, false);
 		TextOut(hdc,
-			150, 400 + len/15,
+			150, 400 + len / 15,
 			currentPass.c_str(), len
 		);
 
@@ -481,7 +507,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		for (Account acc : accounts) {
 			std::wstring txt = acc.title + _T(" - ") + acc.username.c_str() + L": " + acc.password.c_str();
 			setFont(hdc, 21, defaultFontType, FW_EXTRALIGHT, false);
-			TextOut(hdc, 
+			TextOut(hdc,
 				650, optionYOffset - 5 + iter * 25,
 				txt.c_str(), _tcslen(txt.c_str()));
 			iter++;
@@ -529,6 +555,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				currentPass = L"";
 				InvalidateRect(hWnd, 0, TRUE);
 				encrypt(*bf, accounts);
+				addDeleteButton(optionYOffset - 5 + (deleteButtons.size() - 1) * 25);
 			}
 		}
 		else if ((HWND)lParam == languageSelector && HIWORD(wParam) == CBN_SELCHANGE) {
@@ -543,6 +570,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			std::string choice = WidestringToString(wChoice);
 			std::transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
 			currentLang = choice;
+		}
+		else {
+			int i = 0;
+			for (HWND dButton : deleteButtons) {
+				if ((HWND)lParam == dButton)
+					if (i > 0) {
+						accounts.erase(accounts.begin() + i - 1);
+					}
+					else {
+						accounts.erase(accounts.begin());
+					}
+				DestroyWindow(dButton);
+				i++;
+			}
+			deleteButtons.clear();
+			int iter = 0;
+			for (Account acc : accounts) {
+				addDeleteButton(optionYOffset - 5 + iter * 25);
+				iter++;
+			}
+			encrypt(*bf, accounts);
+			InvalidateRect(hWnd, 0, TRUE);
 		}
 		break;
 	case WM_DESTROY:
