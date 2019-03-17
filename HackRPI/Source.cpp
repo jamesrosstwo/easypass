@@ -25,6 +25,7 @@ static TCHAR szTitle[] = _T("Mnemonic Passwords");
 HFONT defaultFont;
 HWND parentWindow;
 HWND genPasswordButton;
+HWND savePasswordButton;
 HWND languageSelector;
 HWND titleBox;
 HWND usernameBox;
@@ -87,7 +88,7 @@ void initColourScheme() {
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"midCharcoal", midCharcoal));
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"darkCharcoal", darkCharcoal));
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"accentGold", accentGold));
-	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"bg", midCharcoal));
+	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"bg", darkCharcoal));
 	colourScheme.insert(std::pair<LPCWSTR, COLORREF>(L"white", white));
 }
 
@@ -252,6 +253,20 @@ int CALLBACK WinMain(
 		(HINSTANCE)GetWindowLong(parentWindow, GWL_HINSTANCE),
 		NULL);      // Pointer not needed.
 	SendMessage(genPasswordButton, WM_SETFONT, (WPARAM)defaultFont, TRUE);
+	
+	savePasswordButton = CreateWindow(
+		L"BUTTON",  // Predefined class; Unicode assumed 
+		L"Save",      // Button text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+		150,         // x position 
+		580,         // y position 
+		400,        // Button width
+		50,        // Button height
+		parentWindow,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(parentWindow, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+	SendMessage(savePasswordButton, WM_SETFONT, (WPARAM)defaultFont, TRUE);
 
 	if (!parentWindow)
 	{
@@ -300,12 +315,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_PAINT:
 	{
+
 		hdc = BeginPaint(hWnd, &ps);
+
+		RECT navbar;
+		navbar.left = 0;
+		navbar.right = frameWidth;
+		navbar.top = 0;
+		navbar.bottom = 80;
+
+		HBRUSH navbarBrush = CreateSolidBrush(colourScheme.at(L"midBlue"));
+		FillRect(hdc, &navbar, navbarBrush);
+		
 		setFont(hdc, 45, defaultFontType, FW_DONTCARE, false);
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, colourScheme.at(L"white"));
 		TextOut(hdc,
-			534, 20,
+			534, 15,
 			frameTitle, _tcslen(frameTitle));
 
 
@@ -324,6 +350,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			150, 230,
 			L"Username", _tcslen(L"Username"));
 
+		SetTextColor(hdc, colourScheme.at(L"accentGold"));
+
+		UINT len = _tcslen(currentPass.c_str());
+		setFont(hdc, 65-len, defaultFontType, FW_THIN, false);
+		TextOut(hdc,
+			150, 300,
+			currentPass.c_str(), len
+			);
+
 		int iter = 0;
 		for (Account acc : accounts) {
 			OutputDebugString(L"Working");
@@ -340,17 +375,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_COMMAND:
 		if ((HWND)lParam == genPasswordButton) {
-			Account acc;
-			acc.title = getTextFromTextBox(titleBox);
-			acc.username = getTextFromTextBox(usernameBox);
-			acc.password = genPass(30, currentLang);;
-			accounts.push_back(acc);
-
-			for (Account a : accounts) {
-				OutputDebugString(a.title.c_str());
-			}
+			currentPass = genPass(30, currentLang);
 
 			InvalidateRect(hWnd, 0, TRUE);
+		}
+		else if ((HWND)lParam == savePasswordButton) {
+			Account acc;
+			std::wstring title = getTextFromTextBox(titleBox);
+			std::wstring username = getTextFromTextBox(usernameBox);
+			if (title.empty()) {
+				MessageBox(parentWindow,
+					_T("Missing Title"),
+					_T("Password Generation"),
+					NULL);
+			}
+			else if (username.empty()) {
+				MessageBox(parentWindow,
+					_T("Missing Username"),
+					_T("Password Generation"),
+					NULL);
+			}
+			else {
+				acc.title = getTextFromTextBox(titleBox);
+				acc.username = getTextFromTextBox(usernameBox);
+				acc.password = currentPass;
+				accounts.push_back(acc);
+				SetWindowTextW(usernameBox, L"");
+				SetWindowTextW(titleBox, L"");
+				//set window text https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setwindowtextw
+				InvalidateRect(hWnd, 0, TRUE);
+			}
 		}
 		else if ((HWND)lParam == languageSelector && HIWORD(wParam) == CBN_SELCHANGE) {
 			int ItemIndex = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL,
