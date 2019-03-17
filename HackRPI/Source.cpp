@@ -11,12 +11,14 @@
 #include <vector>
 #include "PasswordGenerator.h"
 
-#define IDC_MAIN_EDIT	101
+#define IDC_MAIN_EDIT 101
 
 // The main window class name.
 static TCHAR szWindowClass[] = _T("Source");
 static int frameWidth = 1400;
 static int frameHeight = 750;
+int optionYOffset = 120;
+int buttonYOffset = 20;
 static std::map<LPCWSTR, COLORREF> colourScheme;
 static LPCWSTR defaultFontType = L"Segoe UI";
 
@@ -119,7 +121,7 @@ HFONT setFont(HDC hdc, long fontSize, LPCWSTR fontChoice, UINT weight, bool isIt
 
 HWND createLanguageSelector() {
 	int xpos = 300;            // Horizontal position of the window.
-	int ypos = 100;            // Vertical position of the window.
+	int ypos = optionYOffset;            // Vertical position of the window.
 	int nwidth = 250;          // Width of the window
 	int nheight = 300;         // Height of the window
 
@@ -143,7 +145,7 @@ HWND createLanguageSelector() {
 
 HWND createTitleBox() {
 	int x = 300;
-	int y = 165;
+	int y = 65 + optionYOffset;
 	int w = 250;
 	int h = 30;
 
@@ -156,7 +158,7 @@ HWND createTitleBox() {
 
 HWND createUsernameBox() {
 	int x = 300;
-	int y = 230;
+	int y = 130 + optionYOffset;
 	int w = 250;
 	int h = 30;
 
@@ -245,7 +247,7 @@ int CALLBACK WinMain(
 		L"Generate",      // Button text 
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
 		150,         // x position 
-		650,         // y position 
+		650 - buttonYOffset,         // y position 
 		400,        // Button width
 		50,        // Button height
 		parentWindow,     // Parent window
@@ -259,7 +261,7 @@ int CALLBACK WinMain(
 		L"Save",      // Button text 
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
 		150,         // x position 
-		580,         // y position 
+		580 - buttonYOffset,         // y position 
 		400,        // Button width
 		50,        // Button height
 		parentWindow,     // Parent window
@@ -315,7 +317,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_PAINT:
 	{
-
 		hdc = BeginPaint(hWnd, &ps);
 
 		RECT navbar;
@@ -339,15 +340,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		setFont(hdc, 28, defaultFontType, FW_THIN, false);
 
 		TextOut(hdc,
-			150, 100,
+			150, optionYOffset,
 			L"Language", _tcslen(L"Language"));
 
 		TextOut(hdc,
-			150, 164,
+			150, 65 + optionYOffset,
 			L"Title", _tcslen(L"Title"));
 
 		TextOut(hdc,
-			150, 230,
+			150, 130 + optionYOffset,
 			L"Username", _tcslen(L"Username"));
 
 		SetTextColor(hdc, colourScheme.at(L"accentGold"));
@@ -359,12 +360,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			currentPass.c_str(), len
 			);
 
+		SetTextColor(hdc, colourScheme.at(L"white"));
+		setFont(hdc, 30, defaultFontType, FW_THIN, false);
 		int iter = 0;
 		for (Account acc : accounts) {
-			OutputDebugString(L"Working");
 			std::wstring txt = acc.title + _T(" - ") + acc.username.c_str() + L": " + acc.password.c_str();
 			TextOut(hdc,
-				650, 94 + iter * 40,
+				650, optionYOffset - 5 + iter * 40,
 				txt.c_str(), _tcslen(txt.c_str()));
 			iter++;
 		}
@@ -395,6 +397,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					_T("Password Generation"),
 					NULL);
 			}
+			else if (currentPass.empty()) {
+				MessageBox(parentWindow,
+					_T("Missing Password"),
+					_T("Password Generation"),
+					NULL);
+			}
 			else {
 				acc.title = getTextFromTextBox(titleBox);
 				acc.username = getTextFromTextBox(usernameBox);
@@ -402,7 +410,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				accounts.push_back(acc);
 				SetWindowTextW(usernameBox, L"");
 				SetWindowTextW(titleBox, L"");
-				//set window text https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setwindowtextw
+				currentPass = L"";
 				InvalidateRect(hWnd, 0, TRUE);
 			}
 		}
