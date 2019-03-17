@@ -152,6 +152,8 @@
     <ClInclude Include="Account.h" />
     <ClInclude Include="Blowfish.h" />
     <ClInclude Include="PasswordGenerator.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="StringConverter.h" />
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +168,10 @@
     <Text Include="Words\polish.txt" />
     <Text Include="Words\portuguese.txt" />
     <Text Include="Words\spanish.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HackRPI1.rc" />
+    <ResourceCompile Include="Resources.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

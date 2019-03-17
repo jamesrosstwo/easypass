@@ -277,14 +277,19 @@ int CALLBACK WinMain(
 	_In_ HINSTANCE hPrevInstance,
 	_In_ LPSTR     lpCmdLine,
 	_In_ int       nCmdShow
+
 )
 {
 	initColourScheme();
 	std::wstring mPassword;
-	std::wifstream wStream("C:\\Users\\james.ross\\Desktop\\masterpass.txt");
+	std::wifstream wStream("C:\\Users\\alex.zhang\\Desktop\\masterpass.txt");
 	getline(wStream, mPassword);
 	OutputDebugString(mPassword.c_str());
-	bf = new BLOWFISH(WidestringToString(mPassword));
+	std::string process = WidestringToString(mPassword);
+	if (process.length() % 2 != 0) {
+		process = process + "0";
+	}
+	bf = new BLOWFISH(process);
 
 	accounts = decrypt(*bf);
 	addDeleteButton(optionYOffset - 5 + 2 * 25);
