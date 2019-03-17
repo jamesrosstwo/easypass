@@ -13,6 +13,11 @@
 
 #define IDC_MAIN_EDIT 101
 
+
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"") 
+
 // The main window class name.
 static TCHAR szWindowClass[] = _T("Source");
 static int frameWidth = 1400;
@@ -182,7 +187,7 @@ HWND createLengthSelector() {
 	long defaultPos = 20;
 
 	HWND hw = CreateWindowExW(0, TRACKBAR_CLASS, L"Trackbar Control",
-		WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_TRANSPARENTBKGND | TBS_BOTTOM,
+		WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_BOTTOM,
 		x, y, w, h,
 		parentWindow, NULL, hInst, NULL);
 
@@ -366,7 +371,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hWnd, 0, TRUE);
 		}
 	}
-	break;
 	case WM_PAINT:
 	{
 		hdc = BeginPaint(hWnd, &ps);
