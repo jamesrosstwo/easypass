@@ -411,18 +411,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		hdc = BeginPaint(hWnd, &ps);
 
+	
+
+		HBRUSH navbarBrush = CreateSolidBrush(colourScheme.at(L"midBlue"));
 		RECT navbar;
 		navbar.left = 0;
 		navbar.right = frameWidth;
 		navbar.top = 0;
 		navbar.bottom = 80;
 
-		HBRUSH navbarBrush = CreateSolidBrush(colourScheme.at(L"midBlue"));
 		FillRect(hdc, &navbar, navbarBrush);
 
-	/*	Gdiplus::Graphics graphics(hdc);
-		Gdiplus::Pen pen(colourScheme.at(L"accentGold"));
-		graphics.DrawLine(&pen, 700, 50, 700, 700);*/
+
+
+		HBRUSH lineBrush = CreateSolidBrush(colourScheme.at(L"accentGold"));
+		RECT divider;
+		divider.top = 100;
+		divider.left = 609;
+		divider.right = 610;
+		divider.bottom = 700;
+		FillRect(hdc, &divider, lineBrush);
 
 		setFont(hdc, 45, defaultFontType, FW_DONTCARE, false);
 		SetBkMode(hdc, TRANSPARENT);
@@ -470,12 +478,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		);
 
 		SetTextColor(hdc, colourScheme.at(L"white"));
-		setFont(hdc, 30, defaultFontType, FW_THIN, false);
 		int iter = 0;
 		for (Account acc : accounts) {
 			std::wstring txt = acc.title + _T(" - ") + acc.username.c_str() + L": " + acc.password.c_str();
-			TextOut(hdc,
-				650, optionYOffset - 5 + iter * 40,
+			setFont(hdc, 21, defaultFontType, FW_EXTRALIGHT, false);
+			TextOut(hdc, 
+				650, optionYOffset - 5 + iter * 25,
 				txt.c_str(), _tcslen(txt.c_str()));
 			iter++;
 		}
