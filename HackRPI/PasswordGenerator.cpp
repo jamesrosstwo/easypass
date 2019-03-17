@@ -15,7 +15,7 @@ std::string workingDir()
 	/*char buf[256];
 	GetCurrentDirectoryA(256, buf);
 	return std::string(buf) + '\\';*/
-	return "C:\\Users\\james.ross\\Desktop\\HackRPI\\HackRPI";
+	return "C:\\Users\\alex.zhang\\Desktop\\HackRPI\\HackRPI";
 }
 
 std::wstring genPass(int length, std::string lan) {
