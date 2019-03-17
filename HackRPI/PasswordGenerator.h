@@ -7,6 +7,6 @@
 #include <string>
 
 
- std::wstring genPass(byte length,  std::string lan);
+std::wstring genPass(int length, std::string lan);
 
 #endif // !PASSWORDGENERATOR_H

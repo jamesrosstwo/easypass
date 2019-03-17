@@ -1,40 +1,41 @@
 #include "PasswordGenerator.h"
 
 #include <fstream>
-#include <iostream>
 #include <stdlib.h>
 #include <windows.h>
 #include <time.h>
 #include <stdio.h>
-using namespace std;
-
+#include <tchar.h>
+#include <filesystem>
 
 const int FILESIZE = 4000;
-wstring genPass(byte length, std::string lan) {
-	wstring out = L"";
+
+std::string workingDir()
+{
+	/*char buf[256];
+	GetCurrentDirectoryA(256, buf);
+	return std::string(buf) + '\\';*/
+	return "C:\\Users\\james.ross\\Desktop\\HackRPI\\HackRPI";
+}
+
+std::wstring genPass(int length, std::string lan) {
+	std::wstring out = L"";
 	while (true) {
 		srand(time(NULL));
 		int startIndex = rand() % FILESIZE;
 		int stepSize = rand() % 5;
 		srand(rand());
-		cout << startIndex;
-		cout << " ";
-		cout << stepSize;
-		string address = "C:\\Users\\alex.zhang\\Desktop\\HackRPI\\HackRPI\\Words\\" + lan + ".txt";
-		wifstream fileIn(address);
-		wstring input;
+		std::string address = workingDir() + "\\Words\\" + lan + ".txt";
+		std::wifstream fileIn(address);
+		std::wstring input;
 
 
 		for (int count = 0; count < startIndex; count++) {
-			getline(fileIn, input);
+			std::getline(fileIn, input);
 		}
 		while (fileIn.is_open()) {
-			//take steps;
-			if (length > 50) {
-				return L"shit";
-			}
 			for (int count = 0; count < stepSize; count++) {
-				getline(fileIn, input);
+				std::getline(fileIn, input);
 			}
 			//checks that the remainder will still allow a word to be put in
 
@@ -46,22 +47,9 @@ wstring genPass(byte length, std::string lan) {
 			//			 getline(fileIn, input);
 			length -= input.length();
 			out = out + input;
-			cout << (int)length;
-			cout << " ";
-			wcout << input;
-			cout << " a" << endl;
 			if (length == 0) {
 				return out;
 			}
-
 		}
-
-
-
-
-
 	}
-
-	//fileIn.open()
 }
-

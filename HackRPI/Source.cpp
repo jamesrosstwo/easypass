@@ -5,7 +5,10 @@
 #include <sstream>
 #include <map>
 #include <CommCtrl.h>
-
+#include <codecvt>
+#include <locale>
+#include <algorithm>
+#include "PasswordGenerator.h"
 
 // The main window class name.
 static TCHAR szWindowClass[] = _T("Source");
@@ -23,9 +26,19 @@ HWND languageSelector;
 HWND numWordsSelector;
 HINSTANCE hInst;
 
+std::string languageChoice = "english";
+
 // Forward declarations of functions included in this code module:
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
+std::string WidestringToString(const std::wstring &wstr)
+{
+	if (wstr.empty()) return std::string();
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+	std::string strTo(size_needed, 0);
+	WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+	return strTo;
+}
 
 TCHAR Languages[12][11] =
 {
@@ -238,17 +251,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_COMMAND:
 		if ((HWND)lParam == genPasswordButton) {
-			OutputDebugString(L"Generate!");
+			std::wstring pass = genPass(30, languageChoice);
+			MessageBox(hWnd, pass.c_str(), TEXT("Item Selected"), MB_OK);
 		}
 		if ((HWND)lParam == languageSelector && HIWORD(wParam) == CBN_SELCHANGE) {
-			OutputDebugString(L"LANUGAEG");
 			int ItemIndex = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL,
 				(WPARAM)0, (LPARAM)0);
 			TCHAR  ListItem[256];
 			(TCHAR)SendMessage((HWND)lParam, (UINT)CB_GETLBTEXT,
 				(WPARAM)ItemIndex, (LPARAM)ListItem);
 
-			MessageBox(hWnd, (LPCWSTR)ListItem, TEXT("Item Selected"), MB_OK);
+			int length = 12;
+			std::wstring wChoice((LPCWSTR)ListItem);
+			std::string choice = WidestringToString(wChoice);
+			std::transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
+			languageChoice = choice;
 		}
 		break;
 	case WM_DESTROY:
