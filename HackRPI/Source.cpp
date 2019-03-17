@@ -15,7 +15,7 @@
 #include "StringConverter.h"
 #include "Account.h"
 #include "Blowfish.h"
-
+#include "resource.h"
 #define IDC_MAIN_EDIT 101
 
 
@@ -88,7 +88,7 @@ void addDeleteButton(int yVal) {
 	deleteButtons.push_back(delButton);
 }
 
-const std::string address = "C:\\Users\\james.ross\\Desktop\\pass.txt";
+const std::string address = "C:\\Users\\alex.zhang\\Desktop\\pass.txt";
 std::vector<Account> decrypt(BLOWFISH  enc) {
 	std::wifstream fileIn(address);
 	std::vector<Account> vec;
@@ -302,12 +302,12 @@ int CALLBACK WinMain(
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(101));
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)CreateSolidBrush(colourScheme.at(L"bg"));
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = szWindowClass;
-	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
+	wcex.hIconSm = LoadIcon(wcex.hInstance,MAKEINTRESOURCE(101));
 
 	if (!RegisterClassEx(&wcex))
 	{

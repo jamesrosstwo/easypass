@@ -173,6 +173,9 @@
     <ResourceCompile Include="HackRPI1.rc" />
     <ResourceCompile Include="Resources.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\Downloads\favicon (1).ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
