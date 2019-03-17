@@ -33,7 +33,7 @@ static std::map<LPCWSTR, COLORREF> colourScheme;
 static LPCWSTR defaultFontType = L"Segoe UI";
 
 // The string that appears in the application's title bar.
-static TCHAR szTitle[] = _T("Mnemonic Passwords");
+static TCHAR szTitle[] = _T("EasyPass v1.0");
 HFONT defaultFont;
 HWND parentWindow;
 HWND genPasswordButton;
@@ -43,6 +43,7 @@ HWND titleBox;
 HWND usernameBox;
 HWND numWordsSelector;
 HWND passwordLengthSelector;
+HWND deleteButtons[25];
 HINSTANCE hInst;
 
 std::string currentLang = "english";
@@ -395,7 +396,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 	HFONT g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 	COLORREF g_rgbText = RGB(0, 0, 0);
-	TCHAR frameTitle[] = _T("Mnemonic Password Generator");
+	TCHAR frameTitle[] = _T("EasyPass");
 	switch (message)
 	{
 	case WM_HSCROLL:
@@ -410,8 +411,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 	{
 		hdc = BeginPaint(hWnd, &ps);
-
-	
 
 		HBRUSH navbarBrush = CreateSolidBrush(colourScheme.at(L"midBlue"));
 		RECT navbar;
@@ -436,7 +435,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, colourScheme.at(L"white"));
 		TextOut(hdc,
-			534, 15,
+			635, 15,
 			frameTitle, _tcslen(frameTitle));
 
 
