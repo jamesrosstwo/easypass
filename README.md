@@ -1,4 +1,4 @@
-# HackRPI
+# Easypass
 Secure, memorable passwords at a moment's notice.
 
 ## What it does
@@ -11,3 +11,4 @@ We wrote the software as a windows desktop application using win32, with all the
 In the future, we intend to add additional functionality, such as number substitution within the password, additional language support, and screen ratio adjustments for the GUI (anchor points) to allow for a wider variety of devices to use this software. We hope to implement sorting and searching through your accounts, copying and auto-typing the usernames and passwords.
 
  
+HackRPI 2019
